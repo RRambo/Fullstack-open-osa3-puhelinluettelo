@@ -1,19 +1,22 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
 
-morgan.token('body', function getBody (req, res) { 
-    return JSON.stringify(req.body) 
+morgan.token('body', function getBody(req, res) {
+    return JSON.stringify(req.body)
 })
 
+app.use(express.static('dist'))
+app.use(cors())
 app.use(express.json())
 app.use(morgan('tiny', {
-    skip: function (req, res) { 
+    skip: function (req, res) {
         return req.method === "POST"
     }
 }))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body', {
-    skip: function (req, res) { 
+    skip: function (req, res) {
         return req.method !== "POST"
     }
 }))
@@ -40,6 +43,10 @@ let persons = [
         number: "39-23-6423122"
     }
 ]
+
+app.get('/', (request, response) => {
+    response.send(persons)
+})
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
@@ -71,19 +78,19 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    
+
     if (!body.name) {
         return response.status(400).json({
             error: 'name missing'
         })
     }
-    
+
     if (!body.number) {
         return response.status(400).json({
             error: 'number missing'
         })
     }
-    
+
     if (persons.find(person => person.name === body.name)) {
         return response.status(400).json({
             error: 'name must be unique'
