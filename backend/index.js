@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
-const Person = require('./models/Person')
+const Person = require('./models/person')
 
 morgan.token('body', function getBody(req, res) {
     return JSON.stringify(req.body)
